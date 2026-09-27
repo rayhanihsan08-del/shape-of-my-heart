@@ -1,1075 +1,380 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>LOVE ♡</title>
+<title>Lost in the Signal</title>
 
 <style>
 * {
-    box-sizing: border-box;
-}
-
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: "Courier New", monospace;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    background:
-        radial-gradient(circle at 20% 20%, #fff 0%, #fff8fb 40%, #ffeef5 100%);
-    position: relative;
+  background: #030303;
+  color: #ddd;
+  font-family: "Courier New", monospace;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* =========================
-   FLOATING BACKGROUND HEARTS
-========================= */
-
-.bg-heart {
-    position: fixed;
-    color: #f3a4bd;
-    font-size: 18px;
-    opacity: .65;
-    animation: floatHeart linear infinite;
-    pointer-events: none;
+.screen {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background:
+    radial-gradient(ellipse at center,
+    #111 0%, #050505 55%, #000 100%);
 }
 
-@keyframes floatHeart {
-    0% {
-        transform: translateY(110vh) rotate(0deg);
-        opacity: 0;
-    }
-
-    15% {
-        opacity: .7;
-    }
-
-    100% {
-        transform: translateY(-15vh) rotate(360deg);
-        opacity: 0;
-    }
+/* Scanlines */
+.screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    transparent 0px,
+    transparent 3px,
+    rgba(255,255,255,.035) 4px
+  );
+  z-index: 5;
 }
 
-/* =========================
-   ENVELOPE SCREEN
-========================= */
-
-#envelopeScreen {
-    position: fixed;
-    inset: 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    transition: .8s ease;
+/* Noise */
+.noise {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+  animation: noise 0.2s steps(2) infinite;
 }
 
-.envelope {
-    width: 170px;
-    height: 115px;
-
-    position: relative;
-
-    background: #fffafa;
-    border: 3px solid #e9a2b8;
-    border-radius: 10px;
-
-    box-shadow:
-        0 0 0 4px #fff,
-        0 8px 25px rgba(190, 100, 130, .15);
-
-    cursor: pointer;
-
-    transition: .3s ease;
+@keyframes noise {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(2%,-1%); }
+  50% { transform: translate(-1%,2%); }
+  75% { transform: translate(1%,1%); }
+  100% { transform: translate(-2%,-1%); }
 }
-
-.envelope:hover {
-    transform: scale(1.05);
-}
-
-.envelope::before {
-    content: "";
-
-    position: absolute;
-
-    width: 120px;
-    height: 120px;
-
-    top: -3px;
-    left: 22px;
-
-    border-left: 3px solid #e9a2b8;
-    border-bottom: 3px solid #e9a2b8;
-
-    transform: rotate(-45deg);
-}
-
-.envelope-heart {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -50%);
-
-    font-size: 30px;
-
-    z-index: 2;
-}
-
-.from-text {
-    margin-top: 18px;
-
-    color: #b85b78;
-
-    font-size: 14px;
-}
-
-.from-text::before {
-    content: "♥ ";
-}
-
-.from-text::after {
-    content: " ♥";
-}
-
-/* =========================
-   MAIN LOVE WINDOW
-========================= */
-
-#loveScreen {
-    position: fixed;
-    inset: 0;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-}
-
-.window {
-    width: 330px;
-    min-height: 350px;
-
-    background: #f7c8d8;
-
-    border: 3px solid #d77f9b;
-    border-radius: 8px;
-
-    box-shadow:
-        0 10px 35px rgba(180, 80, 110, .18);
-
-    overflow: hidden;
-
-    position: relative;
-
-    animation: pop .5s ease;
-}
-
-@keyframes pop {
-    from {
-        transform: scale(.7);
-        opacity: 0;
-    }
-
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* =========================
-   WINDOW BAR
-========================= */
-
-.titlebar {
-    height: 30px;
-
-    background: #f6c0d2;
-
-    border-bottom: 2px solid #d77f9b;
-
-    display: flex;
-    align-items: center;
-
-    padding: 0 9px;
-
-    color: #7e3d53;
-
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.window-buttons {
-    margin-left: auto;
-
-    display: flex;
-    gap: 5px;
-}
-
-.window-buttons span {
-    width: 11px;
-    height: 11px;
-
-    background: #fff1f5;
-
-    border: 1px solid #c98299;
-
-    border-radius: 2px;
-}
-
-/* =========================
-   MINI HEART BAR
-========================= */
-
-.mini-bar {
-    height: 25px;
-
-    background: #ffe1ea;
-
-    border-bottom: 2px solid #d77f9b;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 12px;
-
-    color: #b85272;
-
-    font-size: 12px;
-}
-
-/* =========================
-   CONTENT
-========================= */
 
 .content {
-    min-height: 290px;
-
-    background:
-        linear-gradient(45deg, rgba(255,255,255,.35) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(255,255,255,.35) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, rgba(255,255,255,.35) 75%),
-        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.35) 75%);
-
-    background-size: 18px 18px;
-
-    background-position:
-        0 0,
-        0 9px,
-        9px -9px,
-        -9px 0px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    padding: 18px 15px;
-
-    position: relative;
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  width: 95%;
+  max-width: 1000px;
 }
 
-/* =========================
-   TEXT
-========================= */
-
-.question {
-    text-align: center;
-
-    color: #75364d;
-
-    font-size: 17px;
-    font-weight: bold;
-
-    line-height: 1.35;
-
-    margin-bottom: 8px;
+.small {
+  color: #555;
+  font-size: 11px;
+  letter-spacing: 5px;
+  margin-bottom: 45px;
 }
 
-.subtext {
-    color: #92516a;
-    font-size: 10px;
-
-    text-align: center;
-
-    min-height: 22px;
+.lyric {
+  min-height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* =========================
-   PIXEL CAT
-========================= */
-
-.cat {
-    position: relative;
-
-    width: 110px;
-    height: 100px;
-
-    margin: 4px 0 10px;
+.text {
+  font-size: clamp(35px, 8vw, 95px);
+  line-height: 1.2;
+  font-weight: bold;
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  white-space: pre-line;
+  color: #d5d5d5;
+  text-shadow:
+    0 0 5px rgba(255,255,255,.2),
+    2px 0 #222,
+    -2px 0 #333;
+  animation: glitch .3s infinite;
 }
 
-.cat-body {
-    position: absolute;
-
-    width: 90px;
-    height: 72px;
-
-    left: 10px;
-    top: 20px;
-
-    background: #17151b;
-
-    clip-path: polygon(
-        0 25%,
-        15% 25%,
-        15% 0,
-        30% 15%,
-        70% 15%,
-        85% 0,
-        85% 25%,
-        100% 25%,
-        100% 75%,
-        85% 75%,
-        85% 90%,
-        65% 90%,
-        65% 100%,
-        35% 100%,
-        35% 90%,
-        15% 90%,
-        15% 75%,
-        0 75%
-    );
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+    opacity: 1;
+  }
+  20% {
+    transform: translate(-2px,1px);
+  }
+  40% {
+    transform: translate(2px,-1px);
+    opacity: .85;
+  }
+  60% {
+    transform: translate(-1px,2px);
+  }
+  80% {
+    transform: translate(1px,-2px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0);
+  }
 }
 
-.eye {
-    position: absolute;
-
-    width: 18px;
-    height: 18px;
-
-    top: 38px;
-
-    background: white;
-
-    z-index: 2;
+.fade {
+  animation: fade .8s ease forwards;
 }
 
-.eye.left {
-    left: 28px;
+@keyframes fade {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
 }
 
-.eye.right {
-    right: 28px;
-}
-
-.eye::after {
-    content: "";
-
-    position: absolute;
-
-    width: 7px;
-    height: 10px;
-
-    background: #1b1820;
-
-    left: 5px;
-    top: 4px;
-}
-
-.mouth {
-    position: absolute;
-
-    width: 45px;
-    height: 32px;
-
-    background: #ee4f4f;
-
-    left: 33px;
-    top: 63px;
-
-    z-index: 3;
-
-    clip-path: polygon(
-        50% 0,
-        100% 25%,
-        85% 100%,
-        15% 100%,
-        0 25%
-    );
-}
-
-.mouth::before {
-    content: "";
-
-    position: absolute;
-
-    width: 18px;
-    height: 18px;
-
-    background: #ff6b6b;
-
-    left: 13px;
-    top: -4px;
-
-    border-radius: 50%;
-}
-
-/* =========================
-   BUTTONS
-========================= */
-
-.buttons {
-    display: flex;
-
-    justify-content: center;
-
-    gap: 25px;
-
-    margin-top: 5px;
+.controls {
+  margin-top: 50px;
 }
 
 button {
-    font-family: "Courier New", monospace;
-
-    font-size: 13px;
-    font-weight: bold;
-
-    color: #91425e;
-
-    background: #fff9fb;
-
-    border: 2px solid #d9859e;
-
-    border-radius: 5px;
-
-    padding: 9px 18px;
-
-    cursor: pointer;
-
-    transition: .2s;
+  font-family: inherit;
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  padding: 12px 28px;
+  cursor: pointer;
+  letter-spacing: 4px;
+  font-size: 12px;
+  transition: .3s;
 }
 
 button:hover {
-    transform: scale(1.08);
+  color: white;
+  border-color: #aaa;
+  box-shadow: 0 0 15px #333;
 }
 
-#noBtn {
-    position: relative;
+.footer {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  color: #333;
+  font-size: 10px;
+  letter-spacing: 3px;
 }
 
-/* =========================
-   SUCCESS
-========================= */
-
-#success {
-    display: none;
-
-    text-align: center;
-
-    color: #73354d;
+.status {
+  margin-top: 20px;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 2px;
 }
 
-.success-title {
-    font-size: 22px;
-    font-weight: bold;
+@media(max-width:600px) {
+  .text {
+    font-size: 36px;
+    letter-spacing: -1px;
+  }
 
-    margin-top: 5px;
-}
-
-.success-message {
-    font-size: 11px;
-
-    margin-top: 8px;
-
-    color: #96536c;
-}
-
-.love-button {
-    margin-top: 10px;
-
-    background: #ed7fa0;
-
-    color: white;
-
-    border-color: #c85d7e;
-}
-
-/* =========================
-   CONFETTI
-========================= */
-
-.confetti {
-    position: fixed;
-
-    width: 14px;
-    height: 14px;
-
-    pointer-events: none;
-
-    z-index: 100;
-
-    animation: confettiFall 3s linear forwards;
-}
-
-@keyframes confettiFall {
-
-    0% {
-        transform:
-            translateY(-10vh)
-            rotate(0deg);
-
-        opacity: 1;
-    }
-
-    100% {
-        transform:
-            translateY(110vh)
-            rotate(720deg);
-
-        opacity: 0;
-    }
-}
-
-/* =========================
-   MUSIC BUTTON
-========================= */
-
-.music {
-    position: fixed;
-
-    bottom: 18px;
-    right: 18px;
-
-    width: 42px;
-    height: 42px;
-
-    border-radius: 50%;
-
-    padding: 0;
-
-    background: white;
-
-    border: 2px solid #df8da7;
-
-    z-index: 200;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 600px) {
-
-    .window {
-        width: 310px;
-    }
-
-    .envelope {
-        transform: scale(.9);
-    }
-
-    .question {
-        font-size: 16px;
-    }
+  .small {
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
 }
 </style>
 </head>
 
-
 <body>
 
-<!-- BACKGROUND HEARTS -->
+<div class="screen">
+  <div class="noise"></div>
 
-<div id="backgroundHearts"></div>
+  <div class="content">
 
-
-<!-- =========================
-     ENVELOPE
-========================= -->
-
-<div id="envelopeScreen">
-
-    <div
-        class="envelope"
-        onclick="openEnvelope()"
-    >
-        <div class="envelope-heart">
-            ♥
-        </div>
+    <div class="small">
+      UNKNOWN SIGNAL // 001
     </div>
 
-    <div class="from-text">
-        From Someone For You
+    <div class="lyric">
+      <div class="text fade" id="text">
+        SIGNAL LOST
+      </div>
     </div>
 
+    <div class="controls">
+      <button id="play">▶ PLAY</button>
+    </div>
+
+    <div class="status" id="status">
+      SYSTEM STANDBY
+    </div>
+
+  </div>
 </div>
 
-
-<!-- =========================
-     LOVE WINDOW
-========================= -->
-
-<div id="loveScreen">
-
-    <div class="window">
-
-        <!-- TITLE -->
-
-        <div class="titlebar">
-
-            LOVE
-
-            <div class="window-buttons">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-
-        </div>
-
-
-        <!-- HEART BAR -->
-
-        <div class="mini-bar">
-            ♥ ♥ ♥
-        </div>
-
-
-        <!-- CONTENT -->
-
-        <div class="content">
-
-            <!-- QUESTION -->
-
-            <div id="questionArea">
-
-                <div class="question">
-                    Do you want to<br>
-                    be my girlfriend? ♡
-                </div>
-
-
-                <!-- CAT -->
-
-                <div class="cat">
-
-                    <div class="cat-body"></div>
-
-                    <div class="eye left"></div>
-                    <div class="eye right"></div>
-
-                    <div class="mouth"></div>
-
-                </div>
-
-
-                <!-- BUTTONS -->
-
-                <div class="buttons">
-
-                    <button
-                        onclick="sayYes()"
-                    >
-                        YES
-                    </button>
-
-                    <button
-                        id="noBtn"
-                        onmouseover="moveNo()"
-                        onclick="moveNo()"
-                    >
-                        NO
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <!-- SUCCESS -->
-
-            <div id="success">
-
-                <div class="success-title">
-                    Yayy!! I love you ♡
-                </div>
-
-                <div class="cat">
-
-                    <div class="cat-body"></div>
-
-                    <div class="eye left"></div>
-                    <div class="eye right"></div>
-
-                    <div class="mouth"></div>
-
-                </div>
-
-                <div class="success-message">
-                    I'm really happy you said yes! ♡
-                </div>
-
-                <button
-                    class="love-button"
-                    onclick="moreLove()"
-                >
-                    I LOVE YOU
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
+<div class="footer">
+  CONNECTION ESTABLISHED // 2026
 </div>
-
-
-<!-- MUSIC -->
-
-<button
-    class="music"
-    onclick="toggleMusic()"
-    id="musicBtn"
->
-    ♪
-</button>
-
-
-<!-- AUDIO
-     GANTI NAMA FILE JIKA PERLU
--->
-
-<audio
-    id="song"
-    loop
->
-    <source
-        src="shape_of_my_heart.mp3"
-        type="audio/mpeg"
-    >
-</audio>
-
 
 <script>
 
-/* ======================================
-   BACKGROUND HEARTS
-====================================== */
+// GANTI TEKS DI SINI SESUKAMU
+// Teks ini contoh original, bukan lirik lagu berhak cipta.
 
-const bg =
-document.getElementById("backgroundHearts");
+const lines = [
+  "THAT I\nDIED SLOW",
+  "OH YOU\nLIED HOME",
+  "IS THAT WE\nBOTH KNOW",
+  "I'M STILL HERE\nON MY OWN",
+  "SOMEWHERE\nIN THE DARK",
+  "LOST INSIDE\nTHE SIGNAL",
+  "END OF\nTRANSMISSION"
+];
 
-function createBackgroundHeart() {
+let index = 0;
+let playing = false;
+let interval;
 
-    const heart =
-    document.createElement("div");
+const text = document.getElementById("text");
+const button = document.getElementById("play");
+const status = document.getElementById("status");
 
-    heart.className = "bg-heart";
+// Ganti teks dengan efek glitch
+function showLine() {
+  text.classList.remove("fade");
 
-    heart.innerHTML =
-        ["♥", "♡", "❤"][Math.floor(Math.random() * 3)];
+  // Force animation restart
+  void text.offsetWidth;
 
-    heart.style.left =
-        Math.random() * 100 + "vw";
+  text.textContent = lines[index];
+  text.classList.add("fade");
 
-    heart.style.fontSize =
-        (10 + Math.random() * 18) + "px";
+  index++;
 
-    heart.style.animationDuration =
-        (5 + Math.random() * 8) + "s";
-
-    heart.style.animationDelay =
-        Math.random() * 4 + "s";
-
-    bg.appendChild(heart);
-
-    setTimeout(() => {
-        heart.remove();
-    }, 14000);
+  if (index >= lines.length) {
+    index = 0;
+  }
 }
 
-setInterval(
-    createBackgroundHeart,
-    350
-);
+// Musik elektronik sederhana dibuat langsung
+// menggunakan Web Audio API.
+// Tidak perlu file musik tambahan.
 
+let audioContext;
+let master;
+let oscillators = [];
+let musicTimer;
 
-/* ======================================
-   OPEN ENVELOPE
-====================================== */
+function startMusic() {
+  audioContext = new (
+    window.AudioContext || window.webkitAudioContext
+  )();
 
-function openEnvelope() {
+  master = audioContext.createGain();
+  master.gain.value = 0.08;
+  master.connect(audioContext.destination);
 
-    const envelope =
-        document.getElementById(
-            "envelopeScreen"
-        );
+  // Chord ambient
+  const notes = [110, 130.81, 164.81, 196];
 
-    const love =
-        document.getElementById(
-            "loveScreen"
-        );
+  notes.forEach((freq, i) => {
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
 
-    envelope.style.opacity = "0";
-    envelope.style.transform = "scale(1.2)";
+    osc.type = "sine";
+    osc.frequency.value = freq;
 
-    setTimeout(() => {
+    gain.gain.value = 0.15;
 
-        envelope.style.display = "none";
+    osc.connect(gain);
+    gain.connect(master);
 
-        love.style.display = "flex";
+    osc.start();
 
-        playMusic();
+    oscillators.push(osc);
+  });
 
-    }, 700);
+  // Bass pulse
+  let beat = 0;
+
+  musicTimer = setInterval(() => {
+    if (!audioContext) return;
+
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.value =
+      beat % 2 === 0 ? 55 : 65.4;
+
+    gain.gain.setValueAtTime(
+      0.15,
+      audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      audioContext.currentTime + 0.7
+    );
+
+    osc.connect(gain);
+    gain.connect(master);
+
+    osc.start();
+    osc.stop(audioContext.currentTime + 0.7);
+
+    beat++;
+  }, 800);
 }
 
+function stopMusic() {
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+  }
 
-/* ======================================
-   MUSIC
-====================================== */
-
-const song =
-document.getElementById("song");
-
-let musicPlaying = false;
-
-function playMusic() {
-
-    song.volume = 0.5;
-
-    song.play()
-        .then(() => {
-            musicPlaying = true;
-            document.getElementById(
-                "musicBtn"
-            ).innerHTML = "♫";
-        })
-        .catch(() => {
-            console.log(
-                "Browser blocked autoplay."
-            );
-        });
+  clearInterval(musicTimer);
 }
 
-function toggleMusic() {
+button.addEventListener("click", async () => {
 
-    if (musicPlaying) {
+  if (!playing) {
+    playing = true;
 
-        song.pause();
+    button.textContent = "■ STOP";
+    status.textContent = "PLAYING // TRANSMISSION ACTIVE";
 
-        musicPlaying = false;
+    showLine();
 
-        document.getElementById(
-            "musicBtn"
-        ).innerHTML = "♪";
+    interval = setInterval(showLine, 3000);
 
-    } else {
+    startMusic();
 
-        song.play();
+  } else {
+    playing = false;
 
-        musicPlaying = true;
+    clearInterval(interval);
+    stopMusic();
 
-        document.getElementById(
-            "musicBtn"
-        ).innerHTML = "♫";
-    }
-}
+    button.textContent = "▶ PLAY";
+    status.textContent = "SYSTEM STANDBY";
+  }
 
-
-/* ======================================
-   NO BUTTON
-====================================== */
-
-function moveNo() {
-
-    const btn =
-        document.getElementById(
-            "noBtn"
-        );
-
-    const parent =
-        document.querySelector(
-            ".content"
-        );
-
-    const maxX =
-        parent.clientWidth - btn.offsetWidth - 20;
-
-    const maxY =
-        parent.clientHeight - btn.offsetHeight - 20;
-
-    const x =
-        Math.random() * maxX;
-
-    const y =
-        Math.random() * maxY;
-
-    btn.style.position = "absolute";
-
-    btn.style.left = x + "px";
-
-    btn.style.top = y + "px";
-}
-
-
-/* ======================================
-   YES
-====================================== */
-
-function sayYes() {
-
-    document.getElementById(
-        "questionArea"
-    ).style.display = "none";
-
-    document.getElementById(
-        "success"
-    ).style.display = "block";
-
-    createConfetti();
-
-}
-
-
-/* ======================================
-   CONFETTI
-====================================== */
-
-function createConfetti() {
-
-    const colors = [
-        "#ff9fbc",
-        "#ffcadb",
-        "#e9a8ff",
-        "#ffd66b",
-        "#ff7272",
-        "#ffffff"
-    ];
-
-    for (
-        let i = 0;
-        i < 90;
-        i++
-    ) {
-
-        const piece =
-            document.createElement(
-                "div"
-            );
-
-        piece.className =
-            "confetti";
-
-        piece.style.left =
-            Math.random() * 100 + "vw";
-
-        piece.style.top =
-            (-10 - Math.random() * 20) + "vh";
-
-        piece.style.background =
-            colors[
-                Math.floor(
-                    Math.random()
-                    * colors.length
-                )
-            ];
-
-        piece.style.borderRadius =
-            Math.random() > .5
-                ? "50%"
-                : "2px";
-
-        piece.style.animationDuration =
-            (2 + Math.random() * 2) + "s";
-
-        piece.style.animationDelay =
-            Math.random() * .8 + "s";
-
-        document.body.appendChild(
-            piece
-        );
-
-        setTimeout(() => {
-            piece.remove();
-        }, 4500);
-    }
-}
-
-
-/* ======================================
-   MORE LOVE
-====================================== */
-
-function moreLove() {
-
-    createConfetti();
-
-    for (
-        let i = 0;
-        i < 30;
-        i++
-    ) {
-
-        setTimeout(() => {
-
-            const heart =
-                document.createElement(
-                    "div"
-                );
-
-            heart.innerHTML = "♥";
-
-            heart.style.position =
-                "fixed";
-
-            heart.style.left =
-                Math.random() * 100 + "vw";
-
-            heart.style.bottom =
-                "-30px";
-
-            heart.style.fontSize =
-                (15 + Math.random() * 30)
-                + "px";
-
-            heart.style.color =
-                "#ed7fa0";
-
-            heart.style.zIndex = "200";
-
-            heart.style.transition =
-                "3s ease";
-
-            document.body.appendChild(
-                heart
-            );
-
-            setTimeout(() => {
-
-                heart.style.transform =
-                    `translateY(-${window.innerHeight + 100}px)`;
-
-                heart.style.opacity = "0";
-
-            }, 50);
-
-            setTimeout(() => {
-                heart.remove();
-            }, 3200);
-
-        }, i * 80);
-    }
-}
+});
 
 </script>
 
